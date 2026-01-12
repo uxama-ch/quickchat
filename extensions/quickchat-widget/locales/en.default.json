@@ -1,0 +1,8 @@
+{
+    "name": "QuickChat Widget",
+    "settings": {
+        "paragraph": {
+            "content": "Configure your WhatsApp widget in the QuickChat app dashboard."
+        }
+    }
+}

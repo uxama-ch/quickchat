@@ -1,0 +1,11 @@
+api_version = "2026-04"
+
+[[extensions]]
+uid = "2cc70ebf-edd3-54d3-1520-e6725b91c99bc6c39503"
+type = "theme"
+name = "QuickChat Widget"
+handle = "quickchat-widget"
+
+[[extensions.targeting]]
+module = "./blocks/widget.liquid"
+target = "section.template"

@@ -1,0 +1,249 @@
+{% comment %}
+  QuickChat WhatsApp Widget
+  Reads settings from shop metafields and displays a floating WhatsApp button
+{% endcomment %}
+
+{% assign settings_json = shop.metafields.quickchat.settings.value %}
+{% assign plan = shop.metafields.quickchat.plan.value | default: "free" %}
+
+{% comment %} Default settings if metafield not set {% endcomment %}
+{% assign phone = settings_json.phoneNumber | default: "" %}
+{% assign cta_text = settings_json.ctaText | default: "Chat with us" %}
+{% assign default_message = settings_json.defaultMessage | default: "" %}
+{% assign position = settings_json.position | default: "right" %}
+{% assign color_bg = settings_json.colorBg | default: "#25D366" %}
+{% assign color_text = settings_json.colorText | default: "#FFFFFF" %}
+{% assign animation = settings_json.animationStyle | default: "none" %}
+
+{% comment %} Pro settings {% endcomment %}
+{% assign device_target = settings_json.deviceTarget | default: "all" %}
+{% assign trigger_type = settings_json.triggerType | default: "immediate" %}
+{% assign trigger_delay = settings_json.triggerDelay | default: 3 %}
+{% assign trigger_scroll = settings_json.triggerScroll | default: 25 %}
+{% assign enable_business_hours = settings_json.enableBusinessHours | default: false %}
+{% assign business_hours_start = settings_json.businessHoursStart | default: "09:00" %}
+{% assign business_hours_end = settings_json.businessHoursEnd | default: "17:00" %}
+{% assign offline_message = settings_json.offlineMessage | default: "We're currently offline. Leave a message!" %}
+{% assign hide_when_offline = settings_json.hideWhenOffline | default: false %}
+
+{% comment %} Multi-agent settings (Pro) {% endcomment %}
+{% assign enable_multi_agent = settings_json.enableMultiAgent %}
+{% assign agents = settings_json.agents %}
+
+{% comment %} Page exclusion settings (Pro) {% endcomment %}
+{% assign enable_page_exclusion = settings_json.enablePageExclusion %}
+{% assign exclude_cart = settings_json.excludeCart %}
+{% assign exclude_checkout = settings_json.excludeCheckout %}
+{% assign exclude_custom_pages = settings_json.excludeCustomPages | default: "" %}
+
+{% comment %} Context-aware messages (Pro) {% endcomment %}
+{% assign enable_context_messages = settings_json.enableContextMessages %}
+{% assign product_page_message = settings_json.productPageMessage | default: "Hi! I'm interested in {{product_name}}" %}
+{% assign collection_page_message = settings_json.collectionPageMessage | default: "Hi! I'm browsing {{collection_name}}" %}
+{% assign cart_page_message = settings_json.cartPageMessage | default: "Hi! I have a question about my cart" %}
+
+{% comment %} Premium button effects (Pro) {% endcomment %}
+{% assign button_effect = settings_json.buttonEffect | default: "none" %}
+{% assign bottom_margin = settings_json.bottomMargin | default: 20 %}
+{% assign side_margin = settings_json.sideMargin | default: 20 %}
+{% assign custom_icon = settings_json.customIcon | default: "" %}
+
+{% comment %} Gate button effects for non-Pro {% endcomment %}
+{% if plan != "pro" and button_effect != "none" %}
+  {% assign button_effect = "none" %}
+{% endif %}
+
+{% comment %} Pro animations list - gate if not on Pro plan {% endcomment %}
+{% assign pro_animations = "swing,tada,jello,float,glow,spin,flip,rubberband,wobble,flash,zoom,slidein,pop,wave,morph" | split: "," %}
+{% assign is_pro_animation = false %}
+{% for pro_anim in pro_animations %}
+  {% if animation == pro_anim %}
+    {% assign is_pro_animation = true %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} Fallback to pulse if Pro animation used on Free plan {% endcomment %}
+{% if is_pro_animation and plan != "pro" %}
+  {% assign animation = "pulse" %}
+{% endif %}
+
+{% comment %} Device class for targeting {% endcomment %}
+{% assign device_class = "" %}
+{% if plan == "pro" and device_target != "all" %}
+  {% assign device_class = "quickchat-device-" | append: device_target %}
+{% endif %}
+
+{% comment %} Build valid agents array {% endcomment %}
+{% assign valid_agents = "" %}
+{% if agents %}
+  {% for agent in agents %}
+    {% if agent.name != blank and agent.phone != blank %}
+      {% if valid_agents != "" %}{% assign valid_agents = valid_agents | append: "|||" %}{% endif %}
+      {% assign valid_agents = valid_agents | append: agent.name | append: ":::" | append: agent.phone %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% comment %} Check if multi-agent should be shown {% endcomment %}
+{% assign show_multi_agent = false %}
+{% if plan == "pro" and enable_multi_agent and valid_agents != "" %}
+  {% assign show_multi_agent = true %}
+{% endif %}
+
+{% comment %} Page Exclusion Logic (Pro) {% endcomment %}
+{% assign should_hide_widget = false %}
+{% if plan == "pro" and enable_page_exclusion %}
+  {% comment %} Check if on cart page {% endcomment %}
+  {% if exclude_cart and request.page_type == "cart" %}
+    {% assign should_hide_widget = true %}
+  {% endif %}
+  
+  {% comment %} Check if on checkout page {% endcomment %}
+  {% if exclude_checkout %}
+    {% if request.path contains "/checkouts" or request.page_type == "checkout" %}
+      {% assign should_hide_widget = true %}
+    {% endif %}
+  {% endif %}
+  
+  {% comment %} Check custom page exclusions {% endcomment %}
+  {% if exclude_custom_pages != blank %}
+    {% assign custom_pages_arr = exclude_custom_pages | split: "," %}
+    {% for custom_page in custom_pages_arr %}
+      {% assign trimmed_page = custom_page | strip %}
+      {% if trimmed_page != blank and request.path contains trimmed_page %}
+        {% assign should_hide_widget = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endif %}
+
+{% comment %} Context-Aware Messages (Pro) - handled by JS since product/collection aren't available in app extension blocks {% endcomment %}
+{% assign final_message = default_message %}
+{% assign context_messages_enabled = false %}
+{% if plan == "pro" and enable_context_messages %}
+  {% assign context_messages_enabled = true %}
+{% endif %}
+
+{% comment %} Only render if phone number is set OR multi-agent is enabled, AND not excluded {% endcomment %}
+{% unless should_hide_widget %}
+{% if phone != blank or show_multi_agent %}
+  {% assign whatsapp_url = "https://wa.me/" | append: phone %}
+  {% if final_message != blank %}
+    {% assign encoded_message = final_message | url_encode %}
+    {% assign whatsapp_url = whatsapp_url | append: "?text=" | append: encoded_message %}
+  {% endif %}
+
+  <div 
+    id="quickchat-widget"
+    class="quickchat-widget quickchat-{{ position }} quickchat-animation-{{ animation }} {% if plan == 'pro' and button_effect != 'none' %}quickchat-effect-{{ button_effect }}{% endif %} {{ device_class }}"
+    style="--quickchat-bg: {{ color_bg }}; --quickchat-text: {{ color_text }}; {% if plan == 'pro' %}bottom: {{ bottom_margin }}px; {% if position == 'right' %}right: {{ side_margin }}px;{% else %}left: {{ side_margin }}px;{% endif %}{% endif %}"
+    {% if plan == "pro" and trigger_type != "immediate" %}
+      data-trigger="{{ trigger_type }}"
+      data-trigger-delay="{{ trigger_delay }}"
+      data-trigger-scroll="{{ trigger_scroll }}"
+    {% endif %}
+    {% if plan == "pro" and enable_business_hours %}
+      data-business-hours="true"
+      data-hours-start="{{ business_hours_start }}"
+      data-hours-end="{{ business_hours_end }}"
+      data-offline-message="{{ offline_message | escape }}"
+      data-hide-when-offline="{{ hide_when_offline }}"
+    {% endif %}
+    {% if show_multi_agent %}
+      data-multi-agent="true"
+    {% endif %}
+    {% if plan == "pro" and settings_json.enableAnalytics %}
+      data-analytics-enabled="true"
+      data-supabase-url="https://ohqnutrhqawhrvfeghad.supabase.co"
+      data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ocW51dHJocWF3aHJ2ZmVnaGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5MDAxMjUsImV4cCI6MjA4MzQ3NjEyNX0._q6fWB-xK1a_7O6RjZ5v0EKTM8faJH_q5frO-kIY87g"
+    {% endif %}
+    {% if context_messages_enabled %}
+      data-context-messages="true"
+      data-product-message="{{ product_page_message | escape }}"
+      data-collection-message="{{ collection_page_message | escape }}"
+      data-cart-message="{{ cart_page_message | escape }}"
+      data-default-message="{{ default_message | escape }}"
+      data-phone="{{ phone }}"
+    {% endif %}
+  >
+    {% if show_multi_agent %}
+      {% comment %} Multi-agent mode - agents appear on hover/tap {% endcomment %}
+      <div class="quickchat-agents-wrapper">
+        <div class="quickchat-agents-list">
+          {% comment %} Offline badge for multi-agent mode - added via data attribute for JS {% endcomment %}
+          {% assign agents_arr = valid_agents | split: "|||" %}
+          {% for agent_data in agents_arr %}
+            {% assign parts = agent_data | split: ":::" %}
+            {% assign agent_name = parts[0] %}
+            {% assign agent_phone = parts[1] %}
+            {% assign agent_url = "https://wa.me/" | append: agent_phone %}
+            {% if default_message != blank %}
+              {% assign agent_url = agent_url | append: "?text=" | append: encoded_message %}
+            {% endif %}
+            <a 
+              href="{{ agent_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="quickchat-agent-btn"
+            >
+              <span class="quickchat-agent-avatar">{{ agent_name | slice: 0 | upcase }}</span>
+              <span class="quickchat-agent-name">{{ agent_name }}</span>
+            </a>
+          {% endfor %}
+        </div>
+        
+        <div class="quickchat-button quickchat-main-btn" role="button" tabindex="0" aria-label="Show team members">
+          <svg class="quickchat-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        </div>
+      </div>
+    {% else %}
+      {% comment %} Single agent button {% endcomment %}
+      <a 
+        href="{{ whatsapp_url }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="quickchat-button"
+        aria-label="Chat on WhatsApp"
+      >
+        {% if plan == "pro" and custom_icon != blank %}
+          <img class="quickchat-icon" src="{{ custom_icon }}" alt="Chat icon" />
+        {% else %}
+          <svg class="quickchat-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        {% endif %}
+        <span class="quickchat-text">{{ cta_text }}</span>
+      </a>
+    {% endif %}
+    
+    {% comment %} Offline message tooltip - only for single agent mode {% endcomment %}
+    {% unless show_multi_agent %}
+      <div class="quickchat-offline-message">
+        {{ offline_message }}
+      </div>
+    {% endunless %}
+  </div>
+
+  {{ 'widget.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'widget.js' | asset_url }}" defer></script>
+{% endif %}
+{% endunless %}
+
+{% schema %}
+{
+  "name": "QuickChat Widget",
+  "target": "body",
+  "javascript": "widget.js",
+  "stylesheet": "widget.css",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Configure your WhatsApp widget in the QuickChat app dashboard."
+    }
+  ]
+}
+{% endschema %}

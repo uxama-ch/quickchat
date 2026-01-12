@@ -1,0 +1,28 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "465bc0190fd52649b68af470ae9a71f0"
+name = "Quickchat"
+application_url = "https://example.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2026-04"
+# Temporarily disabled for localhost mode testing - uncomment for production
+#   [[webhooks.subscriptions]]
+#   topics = [ "app/uninstalled" ]
+#   uri = "/webhooks/app/uninstalled"
+#
+#   [[webhooks.subscriptions]]
+#   topics = [ "app/scopes_update" ]
+#   uri = "/webhooks/app/scopes_update"
+
+[access_scopes]
+# Metafield access for SHOP owner is implicit with authenticated admin access
+scopes = ""
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth" ]
