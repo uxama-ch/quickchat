@@ -1,71 +1,37 @@
-<div align="center">
-# 💬 QuickChat
-### WhatsApp Widget for Shopify
-The easiest way to add a WhatsApp chat button to your Shopify store.
-[![Shopify App](https://img.shields.io/badge/Shopify-App_Store-7AB55C?style=for-the-badge&logo=shopify&logoColor=white)](https://apps.shopify.com/quickchat)
-[![WhatsApp](https://img.shields.io/badge/WhatsApp-Integration-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://quickchat.app)
-[Get Started](https://apps.shopify.com/quickchat) · [Website](https://quickchat.app) · [Support](mailto:support@quickchat.app)
-</div>
+# 💬 QuickChat - WhatsApp Widget for Shopify
+The easiest way to add a WhatsApp chat button to your Shopify store. Connect with customers instantly and boost sales through real-time conversations.
+[![Shopify App](https://img.shields.io/badge/Shopify-App_Store-7AB55C?style=flat-square&logo=shopify&logoColor=white)](https://apps.shopify.com/quickchat)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=flat-square&logo=whatsapp&logoColor=white)](https://quickchat.app)
 ---
-## ✨ Features
-| Feature | Free | Pro |
-|---------|:----:|:---:|
-| 🎨 Customizable Colors | ✅ | ✅ |
-| 📱 Mobile Responsive | ✅ | ✅ |
-| 💬 Pre-filled Messages | ✅ | ✅ |
-| 🎬 5 Animations | ✅ | ✅ |
-| 📊 Basic Analytics | ✅ | ✅ |
-| 🎬 15 Premium Animations | ❌ | ✅ |
-| 🌟 Premium Effects (Glass, Neon) | ❌ | ✅ |
-| 🖼️ Custom Icon Upload | ❌ | ✅ |
-| 🕐 Business Hours | ❌ | ✅ |
-| 👥 Multi-Agent Support | ❌ | ✅ |
-| 📈 Full Analytics Dashboard | ❌ | ✅ |
-| 🎯 Page Targeting | ❌ | ✅ |
-| 📝 Context-Aware Messages | ❌ | ✅ |
+## 🆓 Free Plan
+Everything you need to get started:
+- **🎨 Customizable Colors** - Match your brand with custom background and text colors
+- **🎬 5 Animations** - Pulse, Bounce, Shake, Fade, and Heartbeat effects to grab attention
+- **📱 Mobile Responsive** - Works perfectly on phones, tablets, and desktops
+- **💬 Pre-filled Messages** - Auto-fill a message when customers click to chat
+- **📍 Position Control** - Place the widget on the left or right side of your store
+- **📊 Basic Analytics** - Track how many customers click your widget
 ---
-## 🚀 Why QuickChat?
-- **Zero Impact on Speed** - Lightweight widget loads asynchronously
-- **No Code Required** - Install and customize in minutes
-- **Works with All Themes** - Compatible with any Shopify theme
-- **Premium Support** - We're here to help
+## ⭐ Pro Plan - $0.99/month
+Unlock premium features with a **3-day free trial**:
+- **🎬 15 Premium Animations** - Spin, Flip, Glow, Morph, Neon, and 10 more eye-catching effects
+- **✨ Button Effects** - Glassmorphism, Liquid Glass, Neon Glow, Gradient, and 3D Shadow styles
+- **🖼️ Custom Icon Upload** - Replace the WhatsApp icon with your own logo or image
+- **🕐 Business Hours** - Show "online" or "offline" status based on your working hours
+- **👥 Multi-Agent Support** - Add up to 3 team members so customers can choose who to chat with
+- **📈 Full Analytics Dashboard** - See impressions, click rates, and clicks by page type
+- **🎯 Page Targeting** - Hide the widget on cart, checkout, or specific pages
+- **📝 Smart Messages** - Auto-include product name or collection in the pre-filled message
 ---
-## 📸 Screenshots
-<div align="center">
-<table>
-<tr>
-<td><img src="https://quickchat.app/screenshots/widget.png" width="200" alt="Widget Preview"/></td>
-<td><img src="https://quickchat.app/screenshots/dashboard.png" width="200" alt="Dashboard"/></td>
-<td><img src="https://quickchat.app/screenshots/analytics.png" width="200" alt="Analytics"/></td>
-</tr>
-</table>
-</div>
----
-## 💰 Pricing
-| Plan | Price | Features |
-|------|-------|----------|
-| **Free** | $0/month | Basic features, 5 animations |
-| **Pro** | $4.99/month | All features, 3-day free trial |
----
-## 📦 Installation
-1. [Install from Shopify App Store](https://apps.shopify.com/quickchat)
-2. Enter your WhatsApp number
-3. Customize your widget
-4. Enable in Theme Customizer
-5. Start chatting! 🎉
----
-## 🔗 Links
-- [Website](https://quickchat.app)
-- [Shopify App Store](https://apps.shopify.com/quickchat)
-- [Privacy Policy](https://quickchat.app/privacy)
-- [Terms of Service](https://quickchat.app/terms)
+## 🚀 How It Works
+1. **Install** - Add QuickChat from the Shopify App Store
+2. **Configure** - Enter your WhatsApp number and customize the look
+3. **Enable** - Turn on the widget in your Theme Customizer
+4. **Chat** - Start receiving WhatsApp messages from customers!
 ---
 ## 📞 Support
-Having issues? We're here to help!
-- 📧 Email: [support@quickchat.app](mailto:support@quickchat.app)
-- 🌐 Website: [quickchat.app](https://quickchat.app)
+Need help? We're here for you!
+- 🌐 **Website:** [quickchat.app](https://quickchat.app)
+- 📧 **Email:** support@quickchat.app
 ---
-<div align="center">
-**Made with ❤️ for Shopify merchants**
 © 2024 QuickChat. All rights reserved.
-</div>
